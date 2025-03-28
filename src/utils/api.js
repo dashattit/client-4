@@ -1,34 +1,20 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api-shop',  // Соответствует новому прокси
+  baseURL: process.env.NODE_ENV === 'development' ? '/api' : 'http://lifestealer86.ru/api-shop',
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  timeout: 10000  // Таймаут 10 секунд
+    'Content-Type': 'application/json'
+  }
 })
 
-// Обработчик ошибок
-const handleError = (error) => {
-  if (error.response) {
-    console.error('Server response error:', error.response.status)
-  } else if (error.request) {
-    console.error('No response received:', error.request)
-  } else {
-    console.error('Request setup error:', error.message)
-  }
-  return Promise.reject(error)
-}
-
 export default {
-  async getProducts() {
-    try {
-      const response = await api.get('/products')
-      return response.data
-    } catch (error) {
-      handleError(error)
-      throw error
-    }
+  login(credentials) {
+    return api.post('/login', credentials)
   },
+  register(userData) {
+    return api.post('/register', userData)
+  },
+  getProducts() {
+    return api.get('/products')
+  }
 }

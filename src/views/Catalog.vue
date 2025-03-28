@@ -16,7 +16,7 @@
   <script>
   import { computed, onMounted } from 'vue'
   import { useStore } from 'vuex'
-  import ProductCard from '@/components/ProductCard.vue'  // Исправлено .due → .vue
+  import ProductCard from '@/components/ProductCard.vue'  
   
   export default {
     components: { ProductCard },

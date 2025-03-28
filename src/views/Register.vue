@@ -3,18 +3,23 @@
       <h2>Регистрация</h2>
       <form @submit.prevent="submit">
         <div class="form-group">
-          <label>Имя</label>
-          <input v-model="name" required>
+          <label>ФИО</label>
+          <input v-model="fio" required>
+          <div v-if="errors.fio" class="error-message">{{ errors.fio }}</div>
         </div>
         <div class="form-group">
           <label>Email</label>
           <input v-model="email" type="email" required>
+          <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
         </div>
         <div class="form-group">
           <label>Пароль</label>
           <input v-model="password" type="password" required>
+          <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
         </div>
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit" :disabled="loading">
+          {{ loading ? 'Загрузка...' : 'Зарегистрироваться' }}
+        </button>
         <router-link to="/login" class="auth-link">Уже есть аккаунт? Войти</router-link>
       </form>
     </div>
@@ -29,40 +34,45 @@
     setup() {
       const store = useStore()
       const router = useRouter()
-      const name = ref('')
+      const fio = ref('')
       const email = ref('')
       const password = ref('')
+      const errors = ref({})
+      const loading = ref(false)
   
       const submit = async () => {
-        const success = await store.dispatch('register', {
-          name: name.value,
+        loading.value = true
+        errors.value = {}
+        
+        const { success, errors: apiErrors } = await store.dispatch('register', {
+          name: fio.value,
           email: email.value,
           password: password.value
         })
-        if (success) {
+        
+        if (apiErrors) {
+          errors.value = apiErrors
+        } else if (success) {
           router.push('/login')
         }
+        
+        loading.value = false
       }
   
-      return { name, email, password, submit }
+      return { fio, email, password, errors, loading, submit }
     }
   }
   </script>
   
   <style scoped>
-  .auth-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 2rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  .error-message {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
   }
   
-  .auth-link {
-    display: block;
-    margin-top: 1rem;
-    text-align: center;
-    color: #42b983;
+  button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
   </style>
