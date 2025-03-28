@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import store from '@/store'  // Добавленный импорт
+
 import Catalog from '@/views/Catalog.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'

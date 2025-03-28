@@ -1,13 +1,14 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
-  transpileDependencies: true,
-  configureWebpack: {
-    plugins: [
-      new (require('webpack')).DefinePlugin({
-        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
-        __VUE_OPTIONS_API__: 'true',
-        __VUE_PROD_DEVTOOLS__: 'false'
-      })
-    ]
+module.exports = {
+    devServer: {
+      proxy: {
+        '/api-shop': {  // Изменяем ключ проксирования
+          target: 'http://lifestealer86.ru',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/api-shop': '/api-shop'  // Сохраняем оригинальный путь
+          },
+          logLevel: 'debug'
+        }
+      }
+    }
   }
-})
