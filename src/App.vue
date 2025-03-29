@@ -1,54 +1,124 @@
 <template>
-  <div class="app">
-    <header>
-      <h1>Просто купить</h1>
-      <nav>
-        <router-link to="/">Каталог</router-link>
-        <router-link v-if="!isAuthenticated" to="/login">Вход</router-link>
-        <router-link v-if="!isAuthenticated" to="/register">Регистрация</router-link>
-        <router-link v-if="isAuthenticated" to="/orders">Заказы</router-link>
-        <router-link v-if="isAuthenticated" to="/cart">Корзина ({{ cartItemCount }})</router-link>
-        <button v-if="isAuthenticated" @click="logout">Выйти</button>
-      </nav>
-    </header>
+  <header>
+    <nav>
+      <div class="nav-container">
+        <div class="nav-links">
+          <router-link to="/">Каталог</router-link>
+          <router-link to="/cart">Корзина</router-link>
+          <router-link to="/orders" v-if="isAuthenticated">Мои заказы</router-link>
+        </div>
+        <div class="auth-links">
+          <router-link to="/login" v-if="!isAuthenticated">Вход</router-link>
+          <router-link to="/signup" v-if="!isAuthenticated">Регистрация</router-link>
+          <router-link to="/logout" v-if="isAuthenticated">Выход</router-link>
+        </div>
+      </div>
+    </nav>
+  </header>
 
-    <main>
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </main>
-
-    <Notification 
-      v-for="(notification, index) in notifications"
-      :key="index"
-      :type="notification.type"
-      :message="notification.message"
-    />
-  </div>
+  <main>
+    <router-view />
+  </main>
 </template>
 
 <script>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-import Notification from '@/components/Notification.vue'
+import { mapGetters } from 'vuex';
 
 export default {
-  components: { Notification },
-  setup() {
-    const store = useStore()
-
-    return {
-      isAuthenticated: computed(() => store.getters.isAuthenticated),
-      cartItemCount: computed(() => store.getters.cartItemCount),
-      notifications: computed(() => store.state.notifications),
-      logout: () => store.dispatch('logout')
-    }
-  }
-}
+  name: 'App',
+  computed: {
+    ...mapGetters(['isAuthenticated']),
+  },
+};
 </script>
 
 <style>
-/* Стили компонента */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1a1a1a;
+  background-color: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+header {
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+nav {
+  width: 100%;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1.5rem;
+}
+
+.auth-links {
+  display: flex;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+header nav a {
+  font-weight: 500;
+  color: #4a4a4a;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+header nav a:hover {
+  color: #25ebba;
+}
+
+header nav a.router-link-exact-active {
+  color: #25ebba;
+  position: relative;
+}
+
+header nav a.router-link-exact-active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #25ebba;
+}
+
+
+main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 </style>

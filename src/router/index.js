@@ -1,35 +1,60 @@
+import store from '@/store';
 import { createRouter, createWebHistory } from 'vue-router'
-import store from '@/store'  // Добавленный импорт
 
-import Catalog from '@/views/Catalog.vue'
-import Login from '@/views/Login.vue'
-import Register from '@/views/Register.vue'
-import Cart from '@/views/Cart.vue'
-import Orders from '@/views/Orders.vue'
+const ifNotAuthenticated = (to, from, next) => {
+  if (!store.getters.isAuthenticated) {
+      next();
+      return;
+  }
+  next('/home');
+};
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.isAuthenticated) {
+      next();
+      return;
+  }
+  next('/login');
+};
 
 const routes = [
-  { path: '/', component: Catalog },
-  { path: '/login', component: Login, meta: { requiresGuest: true } },
-  { path: '/register', component: Register, meta: { requiresGuest: true } },
-  { path: '/cart', component: Cart, meta: { requiresAuth: true } },
-  { path: '/orders', component: Orders, meta: { requiresAuth: true } }
+  {
+    path: '/',
+    name: 'main',
+    component: () => import('../components/ProductList.vue'),
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../components/Login.vue'),
+    beforeEnter: ifNotAuthenticated,
+  },
+  {
+    path:'/signup',
+    name: 'signup',
+    component: () => import('../components/Register.vue')
+  },
+  {
+    path:'/cart',
+    name: 'cart',
+    component: () => import('../components/Cart.vue')
+  },
+  {
+    path:'/logout',
+    name:'logout',
+    component: () => import('../components/Logout.vue')
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: () => import('../components/Orders.vue'),
+    beforeEnter: ifAuthenticated,
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.getters.isAuthenticated
-  
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login')
-  } else if (to.meta.requiresGuest && isAuthenticated) {
-    next('/')
-  } else {
-    next()
-  }
-})
-
-export default router
+export default router;
